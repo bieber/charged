@@ -1,0 +1,10 @@
+Charged is a puzzle game, albeit at the moment an entirely incomplete one.
+
+The objective of the game is to place charged particles on a map such that their 
+interactions with the other elements of the map ends with a particle striking a 
+target to complete the level.
+
+The entire project is made available as the system "charged" in charged.asd.  
+Just use asdf:load-system or ql:quickload to load the system and then run 
+(charged:main) to start.
+
