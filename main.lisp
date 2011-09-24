@@ -19,4 +19,19 @@
 (in-package :charged)
 
 (defun main ()
-  (format t "Main function for charged"))
+  (let ((e (make-instance 'entity)))
+    (with-init ()
+      ;Starting the display
+      (window 500 500 
+              :double-buffer t
+              :resizable t)
+      ;Running the game loop
+      (with-events ()
+        (:quit-event () t)
+        (:sdl-video-resize-event (:w w :h h) (resize-window w h))
+        (:mouse-motion-event (:x x :y y) 
+                             (setf (entity-position e) (point :x x :y y)))
+        (:idle ()
+               (clear-display *black*)
+               (draw e)
+               (update-display))))))

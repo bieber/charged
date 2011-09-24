@@ -27,6 +27,7 @@
   :depends-on (lispbuilder-sdl)
   :components ((:file "charged-package")
                (:module "entities"
+                        :depends-on ("charged-package")
                         :components ((:file "entity")))
                (:file "main"
                       :depends-on ("charged-package"

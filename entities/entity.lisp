@@ -18,3 +18,26 @@
 
 (in-package :charged)
 
+;; This is the base entity class, from which all game entities will derive.
+;; It allows for the expected basic functionality: movement, drawing, collision
+;; detection, and etc.
+
+(defclass entity ()
+  ((position
+    :documentation "Location on the canvas"
+    :initarg :position
+    :initform (point :x 0 :y 0)
+    :accessor entity-position)
+   (radius
+    :documentation "Radius in pixels.  Entities are circular by default"
+    :initarg radius
+    :initform 10
+    :accessor radius))
+  (:documentation "The base entity class for Charged"))
+
+(defgeneric draw (entity &optional surface)
+  (:documentation "Draws an entity at its position"))
+
+(defmethod draw ((entity entity) &optional (surface *default-surface*))
+  (draw-filled-circle (entity-position entity) (radius entity)
+                      :color *green*))
