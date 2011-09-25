@@ -28,7 +28,12 @@
   :components ((:file "charged-package")
                (:module "entities"
                         :depends-on ("charged-package")
-                        :components ((:file "entity")))
+                        :components ((:file "entity")
+                                     (:file "circle"
+                                            :depends-on ("entity"))
+                                     (:file "box"
+                                            :depends-on ("entity"
+                                                         "circle"))))
                (:file "main"
                       :depends-on ("charged-package"
                                    "entities"))))

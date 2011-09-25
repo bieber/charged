@@ -36,7 +36,7 @@
         (:mouse-button-down-event 
          (:x x :y y)
          (let ((mass (+ (random 30) 20)))
-           (push (make-instance 'entity
+           (push (make-instance 'circle
                                 :velocity (vector (- (random 300) 150)
                                                   (- (random 300) 150))
                                 :radius mass
