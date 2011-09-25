@@ -33,15 +33,17 @@
       (with-events ()
         (:quit-event () t)
         (:sdl-video-resize-event (:w w :h h) (resize-window w h))
+        (:key-down-event () (setf *particles* nil))
         (:mouse-button-down-event 
          (:x x :y y)
-         (let ((mass (+ (random 30) 20)))
-           (push (make-instance 'circle
-                                :velocity (vector (- (random 300) 150)
-                                                  (- (random 300) 150))
-                                :radius mass
-                                :mass mass
-                                :position (vector x y)) *particles*)))
+         (push (make-instance 'box
+                              :velocity (vector (- (random 300) 150)
+                                                (- (random 300) 150))
+                              :size (vector (+ 20 (random 30))
+                                            (+ 20 (random 30)))
+                              :angle (random (* pi 2))
+                              :mass (1+ (random 29))
+                              :position (vector x y)) *particles*))
         
         (:idle ()
                (let ((time-diff (- (sdl-get-ticks) time)))

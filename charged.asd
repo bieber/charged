@@ -26,8 +26,11 @@
   :serial t
   :depends-on (lispbuilder-sdl)
   :components ((:file "charged-package")
+               (:file "geometry-helpers"
+                      :depends-on ("charged-package"))
                (:module "entities"
-                        :depends-on ("charged-package")
+                        :depends-on ("charged-package"
+                                     "geometry-helpers")
                         :components ((:file "entity")
                                      (:file "circle"
                                             :depends-on ("entity"))
