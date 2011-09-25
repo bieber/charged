@@ -27,9 +27,8 @@
   (with-init ()
     (let ((time (sdl-get-ticks)))
       ;Starting the display
-      (window 1024 768
-              :double-buffer t
-              :resizable t)
+      (window 800 600
+              :double-buffer t)
       ;Running the game loop
       (with-events ()
         (:quit-event () t)

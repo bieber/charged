@@ -70,14 +70,7 @@
 
 (defmethod draw ((entity entity) &optional (surface *default-surface*))
   (draw-filled-circle (int-position entity) (entity-radius entity)
-                      :color *green* :surface surface)
-  (let ((x (x (int-position entity)))
-        (y (y (int-position entity)))
-        (vx (x (entity-velocity entity)))
-        (vy (y (entity-velocity entity))))
-        
-    (draw-line (int-position entity) (point :x (+ x vx) :y (+ y vy))
-               :color *red* :surface surface)))
+                      :color *green* :surface surface))
 
 (defmethod move ((entity entity) time)
   (let* ((x-i (x (entity-position entity)))
@@ -158,10 +151,4 @@
                   (* v-1-n (sin theta-1-n))))
     (setf (entity-velocity entity-2)
           (vector (* v-2-n (cos theta-2-n))
-                  (* v-2-n (sin theta-2-n))))
-    ; If entities still overlap, move them until they're clear of each other
-    (loop while (collisionp entity-1 entity-2) do
-         (move entity-1 0.05)
-         (move entity-2 0.05))
-
-))
+                  (* v-2-n (sin theta-2-n))))))
