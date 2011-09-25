@@ -18,20 +18,46 @@
 
 (in-package :charged)
 
+(defvar *particles* nil)
+(defvar *collision* nil)
+
 (defun main ()
-  (let ((e (make-instance 'entity)))
-    (with-init ()
+  (setf *particles* nil)
+  (setf *collision* nil)
+  (with-init ()
+    (let ((time (sdl-get-ticks)))
       ;Starting the display
-      (window 500 500 
+      (window 1024 768
               :double-buffer t
               :resizable t)
       ;Running the game loop
       (with-events ()
         (:quit-event () t)
         (:sdl-video-resize-event (:w w :h h) (resize-window w h))
-        (:mouse-motion-event (:x x :y y) 
-                             (setf (entity-position e) (point :x x :y y)))
+        (:mouse-button-down-event 
+         (:x x :y y)
+         (when (not *collision*)
+           (push (make-instance 'entity
+                                :velocity (vector (- (random 200) 100)
+                                                  (- (random 200) 100))
+                                :radius 70
+                                :position (vector x y)) *particles*))
+         (when *collision*
+           (setf *particles* nil)
+           (setf *collision* nil)))
+                              
         (:idle ()
-               (clear-display *black*)
-               (draw e)
-               (update-display))))))
+               (let ((time-diff (- (sdl-get-ticks) time)))
+                 (when (/= time-diff 0)
+                   (when (not *collision*)
+                     (clear-display *black*)
+                     (loop for p in *particles* do
+                          (move p (/ time-diff 1000.0))
+                          (loop for p2 in *particles* do
+                               (when (collisionp p p2)
+                                 (setf *collision* t)
+                                 (collide p p2)))
+                          (when (not *collision*)
+                            (draw p))))
+                   (update-display)
+                   (setf time (sdl-get-ticks)))))))))
