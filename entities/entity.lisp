@@ -37,7 +37,12 @@
     :documentation "Radius in pixels.  Entities are circular by default"
     :initarg :radius
     :initform 10
-    :accessor entity-radius))
+    :accessor entity-radius)
+  (mass
+   :documentation "Mass in arbitrary units."
+   :initarg :mass
+   :initform 10
+   :accessor entity-mass))
   (:documentation "The base entity class for Charged"))
 
 ; Generic functions
@@ -93,23 +98,6 @@
                     (+ (entity-radius entity-1) (entity-radius entity-2)))))
 
 (defmethod collide ((entity-1 entity) (entity-2 entity))
-  (clear-display *black*)
-  (draw-circle (int-position entity-1) (entity-radius entity-1) :color *green*)
-  (draw-circle (int-position entity-2) (entity-radius entity-2) :color *green*)
-  (draw-line (int-position entity-1)
-             (point :x (+ (x (int-position entity-1)) 
-                          (x (entity-velocity entity-1)))
-                    :y (+ (y (int-position entity-1))
-                          (y (entity-velocity entity-1)))))
-  (draw-line (int-position entity-2)
-             (point :x (+ (x (int-position entity-2))
-                          (x (entity-velocity entity-2)))
-                    :y (+ (y (int-position entity-2))
-                          (y (entity-velocity entity-2)))))
-  ;Line between centers
-  (draw-line (int-position entity-1) (int-position entity-2) :color *yellow*)
-  
-  ; Finding the new axes
   (let* (; Distance between center points
          (dx (- (x (entity-position entity-2))
                 (x (entity-position entity-1))))
@@ -137,47 +125,43 @@
                   (cos (- theta-2 angle))))
          (vn-2 (* v-2
                   (sin (- theta-2 angle))))
-         (distance (sqrt (+ (expt dx 2) (expt dy 2))))
-         (midpoint (point :x (+ (x (entity-position entity-1))
-                                (* (/ distance 2) (cos angle)))
-                          :y (+ (y (entity-position entity-1))
-                                (* (/ distance 2) (sin angle)))))
-         (p1 (point :x (+ (x midpoint)
-                          (* (/ distance 2) (cos perp)))
-                    :y (+ (y midpoint)
-                          (* (/ distance 2) (sin perp)))))
-         (p2 (point :x (- (x midpoint)
-                          (* (/ distance 2) (cos perp)))
-                    :y (- (y midpoint)
-                          (* (/ distance 2) (sin perp))))))
-    (draw-circle midpoint 10 :color *yellow*)
-    (draw-line p1 p2 :color *yellow*)
-    (draw-line (int-position entity-1)
-               (point :x (+ (x (int-position entity-1))
-                            (* vc-1 (cos angle)))
-                      :y (+ (y (int-position entity-1))
-                            (* vc-1 (sin angle))))
-               :color *red*)
-    (draw-line (int-position entity-1)
-               (point :x (+ (x (int-position entity-1))
-                            (* vn-1 (cos perp)))
-                      :y (+ (y (int-position entity-1))
-                            (* vn-1 (sin perp))))
-               :color *red*)
-    (draw-line (int-position entity-2)
-               (point :x (+ (x (int-position entity-2))
-                            (* vc-2 (cos angle)))
-                      :y (+ (y (int-position entity-2))
-                            (* vc-2 (sin angle))))
-               :color *red*)
-    (draw-line (int-position entity-2)
-               (point :x (+ (x (int-position entity-2))
-                            (* vn-2 (cos perp)))
-                      :y (+ (y (int-position entity-2))
-                            (* vn-2 (sin perp))))
-               :color *red*)
-))
+         ; New velocities parallel to AOC
+         (vc-1-n (/ (+ (* vc-1
+                          (- (entity-mass entity-1)
+                             (entity-mass entity-2)))
+                       (* 2
+                          (entity-mass entity-2)
+                          vc-2))
+                    (+ (entity-mass entity-1)
+                       (entity-mass entity-2))))
+         (vc-2-n (/ (+ (* vc-2
+                          (- (entity-mass entity-2)
+                             (entity-mass entity-1)))
+                       (* 2
+                          (entity-mass entity-1)
+                          vc-1))
+                    (+ (entity-mass entity-1)
+                       (entity-mass entity-2))))
+         ; New magnitudes and directions of velocity
+         (theta-1-n (+ angle 
+                       (atan vn-1 vc-1-n)))
+         (v-1-n (sqrt (+ (expt vc-1-n 2)
+                         (expt vn-1 2))))
+         (theta-2-n (+ angle
+                       (atan vn-2 vc-2-n)))
+         (v-2-n (sqrt (+ (expt vc-2-n 2)
+                         (expt vn-2 2)))))
 
-    
-    
-        
+    ; Setting the new velocities
+    (setf (entity-velocity entity-1)
+          (vector (* v-1-n (cos theta-1-n))
+                  (* v-1-n (sin theta-1-n))))
+    (setf (entity-velocity entity-2)
+          (vector (* v-2-n (cos theta-2-n))
+                  (* v-2-n (sin theta-2-n))))
+    ; If entities still overlap, move them until they're clear of each other
+    (loop while (collisionp entity-1 entity-2) do
+         (move entity-1 0.05)
+         (move entity-2 0.05))
+
+))

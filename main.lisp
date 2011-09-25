@@ -36,28 +36,23 @@
         (:sdl-video-resize-event (:w w :h h) (resize-window w h))
         (:mouse-button-down-event 
          (:x x :y y)
-         (when (not *collision*)
+         (let ((mass (+ (random 30) 20)))
            (push (make-instance 'entity
-                                :velocity (vector (- (random 200) 100)
-                                                  (- (random 200) 100))
-                                :radius 70
-                                :position (vector x y)) *particles*))
-         (when *collision*
-           (setf *particles* nil)
-           (setf *collision* nil)))
-                              
+                                :velocity (vector (- (random 300) 150)
+                                                  (- (random 300) 150))
+                                :radius mass
+                                :mass mass
+                                :position (vector x y)) *particles*)))
+        
         (:idle ()
                (let ((time-diff (- (sdl-get-ticks) time)))
                  (when (/= time-diff 0)
-                   (when (not *collision*)
-                     (clear-display *black*)
-                     (loop for p in *particles* do
-                          (move p (/ time-diff 1000.0))
-                          (loop for p2 in *particles* do
-                               (when (collisionp p p2)
-                                 (setf *collision* t)
-                                 (collide p p2)))
-                          (when (not *collision*)
-                            (draw p))))
-                   (update-display)
-                   (setf time (sdl-get-ticks)))))))))
+                   (clear-display *black*)
+                   (loop for p in *particles* do
+                        (move p (/ time-diff 1000.0))
+                        (loop for p2 in *particles* do
+                             (when (collisionp p p2)
+                               (collide p p2)))
+                        (draw p)))
+                 (update-display)
+                 (setf time (sdl-get-ticks))))))))
