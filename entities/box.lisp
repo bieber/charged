@@ -86,7 +86,6 @@
 
 ; When two boxes collide, make sure they separate afterwards to avoid
 ; awkward behavior
+
 (defmethod collide :after ((box-1 box) (box-2 box))
-  (loop while (collisionp box-1 box-2) do
-       (move box-1 0.01)
-       (move box-2 0.01)))
+  (space-out-entities box-1 box-2))

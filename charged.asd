@@ -36,7 +36,10 @@
                                             :depends-on ("entity"))
                                      (:file "box"
                                             :depends-on ("entity"
-                                                         "circle"))))
+                                                         "circle"))
+                                     (:file "inter-entity"
+                                            :depends-on ("circle"
+                                                         "box"))))
                (:file "main"
                       :depends-on ("charged-package"
                                    "entities"))))

@@ -36,7 +36,7 @@
    (mass
     :documentation "Mass in arbitrary units."
     :initarg :mass
-    :initform 10
+    :initform 1
     :accessor entity-mass))
   (:documentation "The base entity class for Charged."))
 
@@ -138,17 +138,14 @@
           (vector (* v-2-n (cos theta-2-n))
                   (* v-2-n (sin theta-2-n))))))
 
-; Helper functions
-(defun rotate-vector-cw (v theta)
-  (vector (+ (* (x v)
-                (cos theta))
-             (* (y v)
-                (sin theta)))
-          (- (* (y v)
-                (cos theta))
-             (* (x v)
-                (sin theta)))))
+; Makes sure two entities are clear of each other after a collision
+(defun space-out-entities (entity-1 entity-2)
+  (loop while (collisionp entity-1 entity-2) do
+       (move entity-1 0.01)
+       (move entity-2 0.01)))
 
-(defun +-vector (v1 v2)
-  (vector (+ (x v1) (x v2))
-          (+ (y v1) (y v2))))
+
+(defmethod collide :after ((entity-1 entity) (entity-2 entity))
+  (space-out-entities entity-1 entity-2))
+
+

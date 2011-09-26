@@ -19,11 +19,13 @@
 (in-package :charged)
 
 (defvar *particles* nil)
-(defvar *collision* nil)
 
 (defun main ()
-  (setf *particles* nil)
-  (setf *collision* nil)
+  (setf *particles* (list (make-instance 'box 
+                                         :size #(50 200)
+                                         :position #(250 250)
+                                         :angle 0
+                                         :mass 500000)))
   (with-init ()
     (let ((time (sdl-get-ticks)))
       ;Starting the display
@@ -36,14 +38,32 @@
         (:key-down-event () (setf *particles* nil))
         (:mouse-button-down-event 
          (:x x :y y)
-         (push (make-instance 'box
-                              :velocity (vector (- (random 300) 150)
-                                                (- (random 300) 150))
-                              :size (vector (+ 20 (random 30))
-                                            (+ 20 (random 30)))
-                              :angle (random (* pi 2))
-                              :mass (1+ (random 29))
-                              :position (vector x y)) *particles*))
+         (push (if (= (random 2) 0)
+                   (let ((width (1+ (random 30))) (height (1+ (random 30))))
+                     (make-instance 'box
+                                    :velocity (vector (- (random 500) 250)
+                                                      (- (random 500) 250))
+                                    :size (vector width height)
+                                    :angle (random (* 2 pi))
+                                    :position (vector x y)
+                                    :mass (* width height)))
+                   (let ((radius (1+ (random 30))))
+                     (make-instance 'circle
+                                    :velocity (vector (- (random 500) 250)
+                                                      (- (random 500) 250))
+                                    :radius radius
+                                    :position (vector x y)
+                                    :mass (* pi radius radius))))
+               *particles*))
+          
+          ;(make-instance 'box
+           ;                   :velocity (vector (- (random 300) 150)
+            ;                                    (- (random 300) 150))
+             ;                 :size (vector (+ 20 (random 30))
+              ;                              (+ 20 (random 30)))
+               ;               :angle (random (* pi 2))
+                ;              :mass (1+ (random 29))
+                 ;             :position (vector x y)) *particles*))
         
         (:idle ()
                (let ((time-diff (- (sdl-get-ticks) time)))
