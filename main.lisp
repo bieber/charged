@@ -20,12 +20,28 @@
 
 (defvar *particles* nil)
 
+(defun walls ()
+  (list (make-instance 'boundary
+                       :size #(801 10)
+                       :position #(400 -5))
+        (make-instance 'boundary 
+                       :size #(801 5)
+                       :position #(400 599))
+        (make-instance 'boundary 
+                       :size #(5 601)
+                       :position #(-5 300))
+        (make-instance 'boundary
+                       :size #(5 601)
+                       :position #(799 300))
+        (make-instance 'boundary
+                       :size #(5 800)
+                       :position #(400 300)
+                       :angle (* 3/4 pi))))
+         
+
 (defun main ()
-  (setf *particles* (list (make-instance 'box 
-                                         :size #(50 200)
-                                         :position #(250 250)
-                                         :angle 0
-                                         :mass 500000)))
+  (setf *particles* (walls))
+                                         
   (with-init ()
     (let ((time (sdl-get-ticks)))
       ;Starting the display
@@ -35,7 +51,7 @@
       (with-events ()
         (:quit-event () t)
         (:sdl-video-resize-event (:w w :h h) (resize-window w h))
-        (:key-down-event () (setf *particles* nil))
+        (:key-down-event () (setf *particles* (walls)))
         (:mouse-button-down-event 
          (:x x :y y)
          (push (if (= (random 2) 0)
@@ -55,16 +71,6 @@
                                     :position (vector x y)
                                     :mass (* pi radius radius))))
                *particles*))
-          
-          ;(make-instance 'box
-           ;                   :velocity (vector (- (random 300) 150)
-            ;                                    (- (random 300) 150))
-             ;                 :size (vector (+ 20 (random 30))
-              ;                              (+ 20 (random 30)))
-               ;               :angle (random (* pi 2))
-                ;              :mass (1+ (random 29))
-                 ;             :position (vector x y)) *particles*))
-        
         (:idle ()
                (let ((time-diff (- (sdl-get-ticks) time)))
                  (when (/= time-diff 0)

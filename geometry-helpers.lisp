@@ -52,7 +52,7 @@
              (* (y v)
                 (cos theta)))))
 
-; Vector addition and subtraction
+; Some vector arithmetic
 (defun add-vectors (v1 v2)
   (vector (+ (x v1) (x v2))
           (+ (y v1) (y v2))))
@@ -60,6 +60,21 @@
 (defun sub-vectors (v1 v2)
   (vector (- (x v1) (x v2))
           (- (y v1) (y v2))))
+
+(defun dot-product (v1 v2)
+  (vector (* (x v1) (x v2))
+          (* (y v1) (y v2))))
+
+(defun vector-multiply (v n)
+  (vector (* n (x v)) (* n (y v))))
+
+(defun magnitude (v)
+  (sqrt (+ (expt (x v) 2) (expt (y v) 2))))
+
+; Reflects the vector v about the given angle
+(defun vector-reflection (v angle)
+  (let ((n (vector (cos angle) (sin angle)))) ; N is our unit vector
+    (sub-vectors (vector-multiply (dot-product v n) 2) v)))
 
 ; Makes a list of +/- x
 (defun plus-minus (x)
@@ -96,4 +111,8 @@
                           (tan (- e-theta (/ pi 2))))
                        2))))))
 
-                         
+; Translates a possibly negative angle into the [0..2pi] range
+(defun normal-angle (theta)
+  (cond ((> theta (* 2 pi)) (normal-angle (- theta (* 2 pi))))
+        ((< theta 0) (normal-angle (+ theta (* 2 pi))))
+        (t theta)))
