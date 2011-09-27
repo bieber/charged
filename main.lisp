@@ -34,9 +34,9 @@
                        :size #(5 601)
                        :position #(799 300))
         (make-instance 'boundary
-                       :size #(5 800)
+                       :size #(50 600)
                        :position #(400 300)
-                       :angle (* 3/4 pi))))
+                       :angle (* 3/5 pi))))
          
 
 (defun main ()

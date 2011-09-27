@@ -96,26 +96,6 @@
 (defun point-from-vector (v)
   (point :x (x v) :y (y v)))
 
-; Finds the radius of a rectangle at a given angle
-(defun rectangle-radius (size theta)
-  (let* (; Finding angle to top-right corner
-         (alpha (atan (y size) (x size)))
-         ; Getting effective theta in convenient comparison range
-         (e-theta (cond ((>= theta (- (* 2 pi) alpha)) (- theta (* 2 pi)))
-                        ((>= theta (- pi alpha)) (- theta pi))
-                        ((<= theta (- (+ pi alpha))) (+ theta (* 2 pi)))
-                        ((<= theta (- alpha)) (+ theta pi))
-                        (t theta)))
-         (half-width (/ (x size) 2))
-         (half-height (/ (y size) 2)))
-    (if (<= e-theta alpha)
-        (sqrt (+ (expt half-width 2)
-                 (expt (* half-width (tan e-theta)) 2)))
-        (sqrt (+ (expt half-height 2)
-                 (expt (* half-height
-                          (tan (- e-theta (/ pi 2))))
-                       2))))))
-
 ; Translates a possibly negative angle into the [0..2pi] range
 (defun normal-angle (theta)
   (cond ((> theta (* 2 pi)) (normal-angle (- theta (* 2 pi))))

@@ -27,27 +27,29 @@
                                          (entity-position box)))
          ; Rotating so the box is normal to the axes
          (circle-center (rotate-vector-cw circle-center-pre (box-angle box)))
-         ; Finding distance and angle between centers
-         (dx (- (x circle-center)))
-         (dy (- (y circle-center)))
-         (theta (atan dy dx))
+         ; Finding distance and angle between centers and corner
+         (dx (abs (x circle-center)))
+         (dy (abs (y circle-center)))
          (distance (sqrt (+ (* dx dx) (* dy dy))))
-         ; Finding the corners of the box
-         (corners (combinations (plus-minus (/ (x (box-size box)) 2))
-                                (plus-minus (/ (y (box-size box)) 2)))))
-    (or (< distance 
-           (+ (circle-radius circle)
-              (rectangle-radius (box-size box) theta)))
-        (reduce #'(lambda (x y) (or x y))
-                (mapcar #'(lambda (v)
-                            (point-in-circle (x circle-center)
-                                             (y circle-center)
-                                             (circle-radius circle)
-                                             (x v)
-                                             (y v)))
-                        corners)))))
-        
-        
+         (corner-distance-sqr (+ (expt (- dx (/ (x (box-size box)) 2)) 2)
+                                 (expt (- dy (/ (y (box-size box)) 2)) 2))))
+
+    ; Disqualifying if circle is >r away from an edge
+    (cond ((> dx (+ (/ (x (box-size box)) 2)
+                   (circle-radius circle)))
+           nil)
+          ((> dy (+ (/ (y (box-size box)) 2)
+                   (circle-radius circle)))
+           nil)
+          ; Returning true if circle center is within r of an edge
+          ((<= dx (/ (x (box-size box)) 2))
+           t)
+          ((<= dy (/ (y (box-size box)) 2))
+           t)
+          ; All that's left is to check the corners
+          (t (<= corner-distance-sqr (expt (circle-radius circle) 2))))))
+                   
+
 
 (defmethod collisionp ((box box) (circle circle))
   (circle-box-collision circle box))
