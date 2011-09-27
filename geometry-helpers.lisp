@@ -62,8 +62,8 @@
           (- (y v1) (y v2))))
 
 (defun dot-product (v1 v2)
-  (vector (* (x v1) (x v2))
-          (* (y v1) (y v2))))
+  (+ (* (x v1) (x v2))
+     (* (y v1) (y v2))))
 
 (defun vector-multiply (v n)
   (vector (* n (x v)) (* n (y v))))
@@ -71,10 +71,15 @@
 (defun magnitude (v)
   (sqrt (+ (expt (x v) 2) (expt (y v) 2))))
 
+; Projects v onto the axis in the direction of l
+(defun vector-projection (v l)
+  (let ((u (vector-multiply l (/ (magnitude l)))))
+    (vector-multiply u (dot-product v u))))
+
 ; Reflects the vector v about the given angle
 (defun vector-reflection (v angle)
   (let ((n (vector (cos angle) (sin angle)))) ; N is our unit vector
-    (sub-vectors (vector-multiply (dot-product v n) 2) v)))
+    (sub-vectors (vector-multiply (vector-projection v n) 2) v)))
 
 ; Makes a list of +/- x
 (defun plus-minus (x)
