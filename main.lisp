@@ -18,21 +18,24 @@
 
 (in-package :charged)
 
-(defvar *particles* nil)
+(defparameter *screen-width* 800)
+(defparameter *screen-height* 600)
+(defparameter *max-charge* 4000)
 
-(defun walls ()
+(defvar *particles* nil)
+(defvar *walls*
   (list (make-instance 'boundary
-                       :size #(801 10)
-                       :position #(400 -5))
+                       :size #(801 100)
+                       :position #(400 -50))
         (make-instance 'boundary 
-                       :size #(801 5)
-                       :position #(400 599))
+                       :size #(801 100)
+                       :position #(400 649))
         (make-instance 'boundary 
-                       :size #(5 601)
-                       :position #(-5 300))
+                       :size #(100 601)
+                       :position #(-50 300))
         (make-instance 'boundary
-                       :size #(5 601)
-                       :position #(799 300))
+                       :size #(100 601)
+                       :position #(849 300))
         (make-instance 'boundary
                        :size #(50 600)
                        :position #(400 300)
@@ -40,7 +43,7 @@
          
 
 (defun main ()
-  (setf *particles* (walls))
+  (setf *particles* nil)
                                          
   (with-init ()
     (let ((time (sdl-get-ticks)))
@@ -51,35 +54,34 @@
       (with-events ()
         (:quit-event () t)
         (:sdl-video-resize-event (:w w :h h) (resize-window w h))
-        (:key-down-event () (setf *particles* (walls)))
+        (:key-down-event () (setf *particles* nil))
         (:mouse-button-down-event 
          (:x x :y y)
-         (push (if (= (random 2) 0)
-                   (let ((width (1+ (random 30))) (height (1+ (random 30))))
-                     (make-instance 'box
-                                    :velocity (vector (- (random 500) 250)
-                                                      (- (random 500) 250))
-                                    :size (vector width height)
-                                    :angle (random (* 2 pi))
-                                    :position (vector x y)
-                                    :mass (* width height)))
-                   (let ((radius (1+ (random 30))))
-                     (make-instance 'circle
-                                    :velocity (vector (- (random 500) 250)
-                                                      (- (random 500) 250))
-                                    :radius radius
-                                    :position (vector x y)
-                                    :mass (* pi radius radius))))
+         (push (let ((radius (1+ (random 30)))
+                     (charge (- (random (1+ (* 2 *max-charge*))) *max-charge*)))
+                 (make-instance 'particle
+                                ;:velocity (vector (- (random 500) 250)
+                                 ;                 (- (random 500) 250))
+                                :velocity #(0 0)
+                                :radius radius
+                                :position (vector x y)
+                                :mass (* pi radius radius)
+                                :charge charge))
                *particles*))
         (:idle ()
                (let ((time-diff (- (sdl-get-ticks) time)))
                  (when (/= time-diff 0)
                    (clear-display *black*)
+                   (loop for w in *walls* do (draw w))
                    (loop for p in *particles* do
-                        (move p (/ time-diff 1000.0))
+                        (loop for w in *walls* do
+                             (when (collisionp p w)
+                               (collide p w)))
                         (loop for p2 in *particles* do
+                             (electric-force p2 p)
                              (when (collisionp p p2)
-                               (collide p p2)))
+                               (collide p p2))
+                             (move p (/ time-diff 1000.0)))
                         (draw p)))
                  (update-display)
                  (setf time (sdl-get-ticks))))))))

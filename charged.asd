@@ -32,12 +32,17 @@
                         :depends-on ("charged-package"
                                      "geometry-helpers")
                         :components ((:file "entity")
+                                     (:file "charged"
+                                            :depends-on ("entity"))
                                      (:file "circle"
                                             :depends-on ("entity"))
                                      (:file "box"
                                             :depends-on ("entity"))
                                      (:file "boundary"
                                             :depends-on ("box"))
+                                     (:file "particle"
+                                            :depends-on ("circle"
+                                                         "charged"))
                                      (:file "inter-entity"
                                             :depends-on ("circle"
                                                          "box"
@@ -45,4 +50,3 @@
                (:file "main"
                       :depends-on ("charged-package"
                                    "entities"))))
-               
