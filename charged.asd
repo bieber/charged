@@ -43,6 +43,8 @@
                                      (:file "particle"
                                             :depends-on ("circle"
                                                          "charged"))
+                                     (:file "goal"
+                                            :depends-on ("circle"))
                                      (:file "inter-entity"
                                             :depends-on ("circle"
                                                          "box"

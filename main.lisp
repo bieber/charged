@@ -39,7 +39,10 @@
         (make-instance 'boundary
                        :size #(50 600)
                        :position #(400 300)
-                       :angle (* 3/5 pi))))
+                       :angle (* 3/5 pi))
+        (make-instance 'goal
+                       :position #(400 60)
+                       :radius 20)))
          
 
 (defun main ()

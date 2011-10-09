@@ -149,3 +149,15 @@
   (space-out-entities entity-1 entity-2))
 
 
+; Makes sure an entity never attempts to draw too far outside the boundaries
+; Prevents stray entities from triggering SDL errors
+(defmethod draw :before ((entity entity) &optional (surface *default-surface*))
+  (when (or (> (x (entity-position entity))
+               (* 2 *screen-width*))
+            (> (y (entity-position entity))
+               (* 2 *screen-height*))
+            (< (x (entity-position entity))
+               (- *screen-width*))
+            (< (y (entity-position entity))
+               (- *screen-height*)))
+    (setf (entity-velocity entity) #(0 0))))
