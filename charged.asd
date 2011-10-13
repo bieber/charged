@@ -49,6 +49,11 @@
                                             :depends-on ("circle"
                                                          "box"
                                                          "boundary"))))
+               (:module "game"
+                        :depends-on ("charged-package"
+                                     "entities")
+                        :components ((:file "level")))
                (:file "main"
                       :depends-on ("charged-package"
-                                   "entities"))))
+                                   "entities"
+                                   "game"))))
